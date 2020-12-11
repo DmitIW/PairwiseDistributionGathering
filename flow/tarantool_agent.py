@@ -59,9 +59,9 @@ class Dst2SrcLegal(SpaceWriter):
 
 class Dst2ProtoAttack(SpaceWriter):
     def _my_space_name(self) -> str:
-        return "dst2proto_attack"
+        return "dst2proto_at"
 
 
 class Dst2ProtoLegal(SpaceWriter):
     def _my_space_name(self) -> str:
-        return "dst2proto_legal"
+        return "dst2proto_lg"
