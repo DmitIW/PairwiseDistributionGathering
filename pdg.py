@@ -1,7 +1,7 @@
 from config import (
     get_clickhouse_url, get_clickhouse_db,
     get_tarantool_url, get_tarantool_port,
-    get_time_offset
+    get_time_offset, get_expiration_time
 )
 from flow import (
     ch_connection, exec_query,
@@ -39,6 +39,7 @@ def main():
     tarantool_space_args = {
         "url": get_tarantool_url(),
         "port": get_tarantool_port(),
+        "expiration_time": get_expiration_time()
     }
 
     time_offset = get_time_offset()

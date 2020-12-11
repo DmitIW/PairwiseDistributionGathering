@@ -37,8 +37,24 @@ def get_tarantool_port(variable_name: str = None, default_value: int = None) -> 
     return os.environ.get(variable_name, default_value)
 
 
-def get_time_offset() -> int:
-    """
-    :return: the time in seconds for offset in past
-    """
-    return 60 * 30 * 1
+DEFAULT_TIME_AMOUNT = 60 * 60 * 1
+
+
+def get_time_offset(variable_name: str = None, default_value: int = None) -> int:
+    if variable_name is None:
+        variable_name = "GATHERING_TIME_OFFSET"
+    if default_value is None:
+        global DEFAULT_TIME_AMOUNT
+        default_value = DEFAULT_TIME_AMOUNT
+
+    return os.environ.get(variable_name, default_value)
+
+
+def get_expiration_time(variable_name: str = None, default_value: int = None) -> int:
+    if variable_name is None:
+        variable_name = "FACT_EXPIRATION_TIME"
+    if default_value is None:
+        global DEFAULT_TIME_AMOUNT
+        default_value = DEFAULT_TIME_AMOUNT
+
+    return os.environ.get(variable_name, default_value)
