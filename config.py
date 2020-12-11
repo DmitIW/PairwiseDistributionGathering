@@ -58,3 +58,13 @@ def get_expiration_time(variable_name: str = None, default_value: int = None) ->
         default_value = DEFAULT_TIME_AMOUNT
 
     return os.environ.get(variable_name, default_value)
+
+
+def get_updating_interval(variable_name: str = None, default_value: int = None) -> int:
+    if variable_name is None:
+        variable_name = "UPDATING_INTERVAL"
+    if default_value is None:
+        global DEFAULT_TIME_AMOUNT
+        default_value = DEFAULT_TIME_AMOUNT
+
+    return os.environ.get(variable_name, default_value)

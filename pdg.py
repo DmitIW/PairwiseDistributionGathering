@@ -1,7 +1,11 @@
+import sys
+import signal
+import time
+
 from config import (
     get_clickhouse_url, get_clickhouse_db,
     get_tarantool_url, get_tarantool_port,
-    get_time_offset, get_expiration_time
+    get_time_offset, get_expiration_time, get_updating_interval
 )
 from flow import (
     ch_connection, exec_query,
@@ -19,9 +23,6 @@ from flow import (
 from processing import (
     get_and_store
 )
-
-import sys
-import signal
 
 pairs = [
     (Src2Dst, (Src2DstLegal, Src2DstAttack)),
@@ -56,10 +57,12 @@ def main():
             flows.append(
                 create_flow(source, destination(**tarantool_space_args), time_offset=time_offset, attack=attack))
 
+    updating_interval_in_seconds = get_updating_interval()
     while True:
         for flow in flows:
             get_and_store(exec_query(clickhouse_database_conn, flow.get_source(), **flow.get_arguments()),
                           flow.get_destination(), lambda x: x.row()[:-1])
+        time.sleep(updating_interval_in_seconds)
 
 
 def exit_gracefully(signum, frame):
