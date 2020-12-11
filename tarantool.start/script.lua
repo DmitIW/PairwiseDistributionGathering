@@ -12,24 +12,18 @@ function create_field(n, t)
     return { name = n, type = t }
 end
 
-function create_format(...)
-    format = {}
-    for i = 1, arg.n do
-        format[i] = arg[i]
-    end
-    return format
-end
-
 function obj2obj_dist_space_formatting(space_name, first_obj_name, second_obj_name, first_obj_type, second_obj_type)
     first_obj_type = first_obj_type or "unsigned"
     second_obj_type = second_obj_type or "unsigned"
 
-    format = create_format(
-            create_field(first_obj_name, first_obj_type),
-            create_field(second_obj_name, second_obj_type),
-            create_field("count", "unsigned"),
-            create_field("time", "unsigned")
-    )
+    print("Formatting ", space_name)
+
+    format = {
+        create_field(first_obj_name, first_obj_type),
+        create_field(second_obj_name, second_obj_type),
+        create_field("count", "unsigned"),
+        create_field("time", "unsigned")
+    }
 
     space = box.schema.space.create(space_name, { format = format, if_not_exists = true })
     space:create_index(
@@ -39,6 +33,9 @@ function obj2obj_dist_space_formatting(space_name, first_obj_name, second_obj_na
                 parts = { first_obj_name, second_obj_name }
             }
     )
+
+    print(space_name, " formatted")
+
     return space
 end
 
@@ -55,8 +52,14 @@ function is_tuple_expired(args, tuple)
 end
 
 function space_prepare(space_name, first_obj_name, second_obj_name, first_obj_type, second_obj_type)
+
+    print("Preparing ", space_name)
+
     space = obj2obj_dist_space_formatting(space_name, first_obj_name, second_obj_name, first_obj_type, second_obj_type)
     expd.run_task(space_name, space.id, is_tuple_expired)
+
+    print(space_name, " ready")
+
     return space
 end
 

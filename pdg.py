@@ -24,6 +24,10 @@ from processing import (
     get_and_store
 )
 
+from utility import (
+    current_time
+)
+
 pairs = [
     (Src2Dst, (Src2DstLegal, Src2DstAttack)),
     (Dst2Src, (Dst2SrcLegal, Dst2SrcAttack)),
@@ -59,9 +63,13 @@ def main():
 
     updating_interval_in_seconds = get_updating_interval()
     while True:
+        start_time = current_time()
+        print("Another loop iteration start")
         for flow in flows:
             get_and_store(exec_query(clickhouse_database_conn, flow.get_source(), **flow.get_arguments()),
                           flow.get_destination(), lambda x: x.row()[:-1])
+        elapsed_time = current_time() - start_time
+        print(f"Another loop iteration over; elapsed: {elapsed_time}")
         time.sleep(updating_interval_in_seconds)
 
 
