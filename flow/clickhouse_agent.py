@@ -16,6 +16,12 @@ from {table}
 prewhere timestamp > toUnixTimestamp(now()) - {time_offset}
 where {self.first_column} != 0
   and {self.second_column} != 0
+group by {self.first_column}, {self.second_column}
+union all
+select {self.first_column}, 0 as {self.second_column}, count() as total_count
+from {table}
+prewhere timestamp > toUnixTimestamp(now()) - {time_offset}
+where {self.first_column} != 0
 group by {self.first_column}, {self.second_column}"""
 
     def target_table(self, attack: bool) -> str:
