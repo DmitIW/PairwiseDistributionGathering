@@ -1,5 +1,9 @@
 import os
 
+from utility.constraints import (
+    return_int
+)
+
 
 def get_clickhouse_url(variable_name: str = None, default_value: str = None) -> str:
     if variable_name is None:
@@ -40,6 +44,7 @@ def get_tarantool_port(variable_name: str = None, default_value: int = None) -> 
 DEFAULT_TIME_AMOUNT = 60 * 60 * 1
 
 
+@return_int
 def get_time_offset(variable_name: str = None, default_value: int = None) -> int:
     if variable_name is None:
         variable_name = "GATHERING_TIME_OFFSET"
@@ -50,6 +55,7 @@ def get_time_offset(variable_name: str = None, default_value: int = None) -> int
     return os.environ.get(variable_name, default_value)
 
 
+@return_int
 def get_expiration_time(variable_name: str = None, default_value: int = None) -> int:
     if variable_name is None:
         variable_name = "FACT_EXPIRATION_TIME"
@@ -60,6 +66,7 @@ def get_expiration_time(variable_name: str = None, default_value: int = None) ->
     return os.environ.get(variable_name, default_value)
 
 
+@return_int
 def get_updating_interval(variable_name: str = None, default_value: int = None) -> int:
     if variable_name is None:
         variable_name = "UPDATING_INTERVAL"
