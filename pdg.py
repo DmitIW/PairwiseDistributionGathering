@@ -20,6 +20,9 @@ from processing import (
     get_and_store
 )
 
+import sys
+import signal
+
 pairs = [
     (Src2Dst, (Src2DstLegal, Src2DstAttack)),
     (Dst2Src, (Dst2SrcLegal, Dst2SrcAttack)),
@@ -53,12 +56,18 @@ def main():
             flows.append(
                 create_flow(source, destination(**tarantool_space_args), time_offset=time_offset, attack=attack))
 
-    for flow in flows:
-        get_and_store(exec_query(clickhouse_database_conn, flow.get_source(), **flow.get_arguments()),
-                      flow.get_destination(), lambda x: x.row()[:-1])
+    while True:
+        for flow in flows:
+            get_and_store(exec_query(clickhouse_database_conn, flow.get_source(), **flow.get_arguments()),
+                          flow.get_destination(), lambda x: x.row()[:-1])
+
+
+def exit_gracefully(signum, frame):
+    sys.exit(0)
 
 
 if __name__ == "__main__":
     print("Gathering start")
+    signal.signal(signal.SIGINT, exit_gracefully)
     main()
     print("Gathering end")
