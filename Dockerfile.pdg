@@ -6,6 +6,9 @@ COPY flow ./
 WORKDIR /tmp/pdg/processing
 COPY processing ./
 
+WORKDIR /tmp/pdg/utility
+COPY utility .
+
 WORKDIR /tmp/pdg
 COPY pyproject.toml poetry.lock config.py pdg.py ./
 
