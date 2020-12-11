@@ -1,9 +1,11 @@
 from typing import Tuple, NoReturn, Union, Any
-from tarantool import Connection, connect
+from tarantool import Connection, connect, error
 
 from processing.storage import Storage
 
 from utility.time import current_time
+
+from warnings import warn
 
 
 def create_connection(url: str, port: int, **kwargs) -> Connection:
@@ -14,7 +16,10 @@ def insert_query(connection: Connection, space_name: Union[int, str],
                  data: Tuple[Union[str, int]], expiration_time: int) -> NoReturn:
     time_now = current_time()
     data = (*data, time_now + expiration_time)
-    connection.upsert(space_name, data, [("=", 3, data[-2]), ("=", 4, data[-1])])
+    try:
+        connection.upsert(space_name, data, [("=", 3, data[-2]), ("=", 4, data[-1])])
+    except error.DatabaseError as e:
+        warn(f"TarantoolAgent:insert:error {str(e)}", DeprecationWarning, stacklevel=1)
 
 
 class SpaceWriter(Storage):

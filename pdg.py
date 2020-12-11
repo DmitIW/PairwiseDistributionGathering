@@ -2,6 +2,8 @@ import sys
 import signal
 import time
 
+from logging import info
+
 from config import (
     get_clickhouse_url, get_clickhouse_db,
     get_tarantool_url, get_tarantool_port,
@@ -64,15 +66,14 @@ def main():
     updating_interval_in_seconds = get_updating_interval()
     while True:
         start_time = current_time()
-        print("Another loop iteration start")
+        info(f"MainLoop:info: start processing")
         for flow in flows:
             get_and_store(exec_query(clickhouse_database_conn, flow.get_source(), **flow.get_arguments()),
                           flow.get_destination(), lambda x: x.row()[:-1])
         elapsed_time = current_time() - start_time
-        print(f"Another loop iteration over; elapsed: {elapsed_time}")
-
         sleep_time = max(0, updating_interval_in_seconds - elapsed_time)
-
+        info(f"MainLoop:info: end processing; elapsed time: {elapsed_time} seconds")
+        info(f"MainLoop:info: next processing iteration after: {sleep_time} seconds")
         time.sleep(sleep_time)
 
 
