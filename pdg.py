@@ -70,7 +70,10 @@ def main():
                           flow.get_destination(), lambda x: x.row()[:-1])
         elapsed_time = current_time() - start_time
         print(f"Another loop iteration over; elapsed: {elapsed_time}")
-        time.sleep(updating_interval_in_seconds)
+
+        sleep_time = max(0, updating_interval_in_seconds - elapsed_time)
+
+        time.sleep(sleep_time)
 
 
 def exit_gracefully(signum, frame):
