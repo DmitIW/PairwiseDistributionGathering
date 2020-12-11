@@ -1,0 +1,17 @@
+FROM python:3.8-slim
+
+WORKDIR /tmp/pdg/flow
+COPY flow ./
+
+WORKDIR /tmp/pdg/processing
+COPY processing ./
+
+WORKDIR /tmp/pdg
+COPY pyproject.toml poetry.lock config.py pdg.py ./
+
+RUN pip install poetry
+RUN poetry install
+
+RUN ls -al
+
+CMD poetry run python pdg.py

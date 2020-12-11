@@ -1,0 +1,26 @@
+version: '3'
+
+services:
+  tarantool1:
+    container_name: pdg.tarantool
+    image: tarantool/tarantool:latest
+    ports:
+      - "3302:3301"
+    volumes:
+      - ./tarantool.start:/opt/tarantool
+      - ./tarantool.cache:/var/lib/tarantool
+    command: tarantool /opt/tarantool/script.lua
+
+  pdg:
+    build:
+      context: .
+      dockerfile: Dockerfile.pdg
+    image: pdg
+    container_name: pdg
+    environment:
+      - CLICKHOUSE_URL=http://10.2.22.54:8123
+      - CLICKHOUSE_DB=pieflow
+      - TARANTOOL_PORT=3302
+    network_mode: host
+    depends_on:
+      - tarantool1

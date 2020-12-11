@@ -1,0 +1,4 @@
+**/*.idea
+
+tarantool.cache/*.snap
+tarantool.cache/*.xlog
