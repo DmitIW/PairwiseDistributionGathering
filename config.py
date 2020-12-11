@@ -32,6 +32,7 @@ def get_tarantool_url(variable_name: str = None, default_value: str = None) -> s
     return os.environ.get(variable_name, default_value)
 
 
+@return_int
 def get_tarantool_port(variable_name: str = None, default_value: int = None) -> int:
     if variable_name is None:
         variable_name = "TARANTOOL_PORT"
