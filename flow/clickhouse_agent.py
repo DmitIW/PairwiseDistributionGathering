@@ -1,7 +1,9 @@
 from infi.clickhouse_orm import (
-    Database, Model, StringField, UInt32Field, UInt16Field, Memory
+    Database, Model, UInt32Field, UInt16Field, Memory
 )
 from typing import Generator, Any, Union, Tuple
+
+from utility.connector import if_connected, if_disconnected, Connector
 
 
 class PairwiseDistQuery:
@@ -88,3 +90,34 @@ def exec_query(database: Database,
 
 def create_connection(database_name: str, url: str, **kwargs) -> Database:
     return Database(database_name, url, readonly=True, **kwargs)
+
+
+class ClickhouseAgent(Connector):
+    def __init__(self, database_name: str, url: str, query_model: Union[Model, SelectQueryResult],
+                 **kwargs):
+        self.connection_context = {
+            "database_name": database_name,
+            "url": url,
+            **kwargs
+        }
+        self.query_model = query_model
+        self.connection = None
+
+    def connected(self) -> bool:
+        if self.connection is None:
+            return False
+        return True
+
+    @if_disconnected
+    def connect(self):
+        self.connection = create_connection(**self.connection_context)
+        return self
+
+    @if_connected
+    def close(self):
+        self.connection = None
+        return self
+
+    @if_connected
+    def exec_query(self, **kwargs) -> Generator[Any, Any, None]:
+        yield from exec_query(self.connection, self.query_model, **kwargs)
