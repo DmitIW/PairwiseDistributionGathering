@@ -1,10 +1,10 @@
 from typing import Tuple, NoReturn, Union, Any
 from tarantool import Connection, connect, error
-from functools import wraps
 
 from processing.storage import Storage
 
 from utility.time import current_time
+from utility.connector import if_connected, if_disconnected, Connector
 
 from warnings import warn
 
@@ -23,27 +23,7 @@ def insert_query(connection: Connection, space_name: Union[int, str],
         warn(f"TarantoolAgent:insert:error {str(e)}", DeprecationWarning, stacklevel=1)
 
 
-def _if_connected(method):
-    @wraps(method)
-    def _check_connection(self, *args, **kwargs):
-        if self.connected():
-            return method(self, *args, **kwargs)
-        raise RuntimeError("Connection was not established")
-
-    return _check_connection
-
-
-def _if_disconnected(method):
-    @wraps(method)
-    def _check_connection(self, *args, **kwargs):
-        if self.connected():
-            raise RuntimeError("Connection is established already")
-        return method(self, *args, **kwargs)
-
-    return _check_connection
-
-
-class SpaceWriter(Storage):
+class SpaceWriter(Storage, Connector):
     def _my_space_name(self) -> str:
         raise NotImplementedError
 
@@ -57,18 +37,18 @@ class SpaceWriter(Storage):
         self.connection = None
         self.expiration_time = expiration_time
 
-    @_if_disconnected
+    @if_disconnected
     def connect(self):
         self.connection = create_connection(**self.connection_context)
         return self
 
-    @_if_connected
+    @if_connected
     def close(self):
         self.connection.close()
         self.connection = None
         return self
 
-    @_if_connected
+    @if_connected
     def insert(self, data: Tuple[Union[int, str]]) -> NoReturn:
         insert_query(self.connection, self._my_space_name(), data, self.expiration_time)
 
@@ -79,6 +59,12 @@ class SpaceWriter(Storage):
         if self.connection is None:
             return False
         return True
+
+    def __enter__(self):
+        return self.connect()
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.close()
 
 
 class Src2DstAttack(SpaceWriter):
