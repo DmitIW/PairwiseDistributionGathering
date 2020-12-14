@@ -11,7 +11,8 @@ from config import (
 )
 from flow import (
     ch_connection, exec_query,
-    Src2Dst, Dst2Src, Dst2Proto
+    Src2Dst, Dst2Src, Dst2Proto,
+    ClickhouseAgent
 )
 from flow import (
     Src2DstAttack, Src2DstLegal,
@@ -40,11 +41,11 @@ LEGAL_POS = 0
 
 
 def main():
-    clickhouse_database_conn = ch_connection(
-        database_name=get_clickhouse_db(),
-        url=get_clickhouse_url(),
-        username="default"
-    )
+    clickhouse_connection_args = {
+        "database_name": get_clickhouse_db(),
+        "url": get_clickhouse_url(),
+        "username": "default"
+    }
 
     tarantool_space_args = {
         "url": get_tarantool_url(),
@@ -60,16 +61,23 @@ def main():
         source = pair[0]
         for position, destination in enumerate(pair[1]):
             attack = position == ATTACK_POS
+            clickhouse_connection_args["query_model"] = source
+            ch_agent = ClickhouseAgent(**clickhouse_connection_args)
             flows.append(
-                create_flow(source, destination(**tarantool_space_args), time_offset=time_offset, attack=attack))
+                create_flow(ch_agent, destination(**tarantool_space_args), time_offset=time_offset, attack=attack))
 
     updating_interval_in_seconds = get_updating_interval()
     while True:
         start_time = current_time()
         info(f"MainLoop:info: start processing")
+
         for flow in flows:
-            get_and_store(exec_query(clickhouse_database_conn, flow.get_source(), **flow.get_arguments()),
-                          flow.get_destination(), lambda x: x.row()[:-1])
+            with flow as context:
+                source = context[0]
+                destination = context[1]
+                get_and_store(source.exec_query(**flow.get_arguments()),
+                              destination, lambda x: x.row()[:-1])
+
         elapsed_time = current_time() - start_time
         sleep_time = max(0, updating_interval_in_seconds - elapsed_time)
         info(f"MainLoop:info: end processing; elapsed time: {elapsed_time} seconds")
