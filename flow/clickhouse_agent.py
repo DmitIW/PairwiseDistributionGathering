@@ -121,3 +121,9 @@ class ClickhouseAgent(Connector):
     @if_connected
     def exec_query(self, **kwargs) -> Generator[Any, Any, None]:
         yield from exec_query(self.connection, self.query_model, **kwargs)
+
+    def __enter__(self):
+        return self.connect()
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.close()
