@@ -1,5 +1,6 @@
 from typing import Tuple, NoReturn, Union, Any
 from tarantool import Connection, connect, error
+from functools import wraps
 
 from processing.storage import Storage
 
@@ -22,24 +23,62 @@ def insert_query(connection: Connection, space_name: Union[int, str],
         warn(f"TarantoolAgent:insert:error {str(e)}", DeprecationWarning, stacklevel=1)
 
 
+def _if_connected(method):
+    @wraps(method)
+    def _check_connection(self, *args, **kwargs):
+        if self.connected():
+            return method(self, *args, **kwargs)
+        raise RuntimeError("Connection was not established")
+
+    return _check_connection
+
+
+def _if_disconnected(method):
+    @wraps(method)
+    def _check_connection(self, *args, **kwargs):
+        if self.connected():
+            raise RuntimeError("Connection is established already")
+        return method(self, *args, **kwargs)
+
+    return _check_connection
+
+
 class SpaceWriter(Storage):
     def _my_space_name(self) -> str:
         raise NotImplementedError
 
     def __init__(self, url: str, port: int, expiration_time: int,
                  **kwargs):
-        self.connection = create_connection(
-            url=url,
-            port=port,
+        self.connection_context = {
+            "url": url,
+            "port": port,
             **kwargs
-        )
+        }
+        self.connection = None
         self.expiration_time = expiration_time
 
+    @_if_disconnected
+    def connect(self):
+        self.connection = create_connection(**self.connection_context)
+        return self
+
+    @_if_connected
+    def close(self):
+        self.connection.close()
+        self.connection = None
+        return self
+
+    @_if_connected
     def insert(self, data: Tuple[Union[int, str]]) -> NoReturn:
         insert_query(self.connection, self._my_space_name(), data, self.expiration_time)
 
     def store(self, data: Any) -> NoReturn:
         self.insert(data)
+
+    def connected(self) -> bool:
+        if self.connection is None:
+            return False
+        return True
 
 
 class Src2DstAttack(SpaceWriter):
