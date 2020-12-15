@@ -24,7 +24,13 @@ select {self.first_column}, 0 as {self.second_column}, count() as total_count
 from {table}
 prewhere timestamp > toUnixTimestamp(now()) - {time_offset}
 where {self.first_column} != 0
-group by {self.first_column}, {self.second_column}"""
+group by {self.first_column}, {self.second_column}
+union all
+select 0, peiflow.accept.src_port, toUInt64(round(count() / uniq(pieflow.accept.dst_port))) as total_count
+from pieflow.accept
+    prewhere timestamp > toUnixTimestamp(now()) - 60 * 30 * 1
+where pieflow.accept.src_port != 0
+group by pieflow.accept.src_port"""
 
     def target_table(self, attack: bool) -> str:
         if attack:
