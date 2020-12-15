@@ -17,4 +17,4 @@ RUN poetry install
 
 RUN ls -al
 
-CMD poetry run python pdg.py
+CMD poetry run python -u pdg.py

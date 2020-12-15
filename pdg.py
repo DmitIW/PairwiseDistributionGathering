@@ -69,7 +69,7 @@ def main():
     updating_interval_in_seconds = get_updating_interval()
     while True:
         start_time = current_time()
-        info(f"MainLoop:info: start processing")
+        print(f"MainLoop:info: start processing")
 
         for flow in flows:
             with flow as context:
@@ -80,8 +80,8 @@ def main():
 
         elapsed_time = current_time() - start_time
         sleep_time = max(0, updating_interval_in_seconds - elapsed_time)
-        info(f"MainLoop:info: end processing; elapsed time: {elapsed_time} seconds")
-        info(f"MainLoop:info: next processing iteration after: {sleep_time} seconds")
+        print(f"MainLoop:info: end processing; elapsed time: {elapsed_time} seconds")
+        print(f"MainLoop:info: next processing iteration after: {sleep_time} seconds")
         time.sleep(sleep_time)
 
 
