@@ -4,6 +4,17 @@ from utility.constraints import (
     return_int
 )
 
+from flow import (
+    Src2Dst, Dst2Src, Dst2Proto,
+)
+from flow import (
+    Src2DstAttack, Src2DstLegal,
+    Dst2SrcAttack, Dst2SrcLegal,
+    Dst2ProtoAttack, Dst2ProtoLegal
+)
+
+from typing import Dict, Any
+
 
 def get_clickhouse_url(variable_name: str = None, default_value: str = None) -> str:
     if variable_name is None:
@@ -76,3 +87,35 @@ def get_updating_interval(variable_name: str = None, default_value: int = None) 
         default_value = DEFAULT_TIME_AMOUNT
 
     return os.environ.get(variable_name, default_value)
+
+
+pairs = [
+    (Src2Dst, (Src2DstLegal, Src2DstAttack)),
+    (Dst2Src, (Dst2SrcLegal, Dst2SrcAttack)),
+    (Dst2Proto, (Dst2ProtoLegal, Dst2ProtoAttack))
+]
+ATTACK_POS = 1
+LEGAL_POS = 0
+
+
+def init() -> Dict[str, Any]:
+    global pairs, ATTACK_POS, LEGAL_POS
+    return {
+        "clickhouse_connection":
+            {
+                "database_name": get_clickhouse_db(),
+                "url": get_clickhouse_url(),
+                "username": "default"
+            },
+        "tarantool_space":
+            {
+                "url": get_tarantool_url(),
+                "port": get_tarantool_port(),
+                "expiration_time": get_expiration_time()
+            },
+        "pairs": pairs,
+        "attack_pos": ATTACK_POS,
+        "legal_pos": LEGAL_POS,
+        "time_offset": get_time_offset(),
+        "updating_interval": get_updating_interval(),
+    }
