@@ -8,7 +8,6 @@ from config import (
     get_time_offset, get_expiration_time, get_updating_interval
 )
 from flow import (
-    ch_connection, exec_query,
     Src2Dst, Dst2Src, Dst2Proto,
     ClickhouseAgent
 )
@@ -22,7 +21,7 @@ from flow import (
 )
 
 from processing import (
-    get_and_store
+    flow_processing_task
 )
 
 from utility import (
@@ -72,8 +71,8 @@ def main():
             with flow as context:
                 source = context[0]
                 destination = context[1]
-                get_and_store(source.exec_query(**flow.get_arguments()),
-                              destination, lambda x: x.row()[:-1])
+                data_gen = map(lambda x: x.row()[:-1], source.exec_query(**flow.get_arguments()))
+                flow_processing_task(data_gen, destination)
 
         elapsed_time = current_time() - start_time
         sleep_time = max(0, updating_interval_in_seconds - elapsed_time)
