@@ -1,4 +1,4 @@
-from utility.time import (
+from utility.current_time import (
     current_time
 )
 

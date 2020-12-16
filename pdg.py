@@ -2,8 +2,6 @@ import sys
 import signal
 import time
 
-from logging import info
-
 from config import (
     get_clickhouse_url, get_clickhouse_db,
     get_tarantool_url, get_tarantool_port,

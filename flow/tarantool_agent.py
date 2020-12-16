@@ -3,7 +3,7 @@ from tarantool import Connection, connect, error
 
 from processing.storage import Storage
 
-from utility.time import current_time
+from utility.current_time import current_time
 from utility.connector import if_connected, if_disconnected, Connector
 
 
