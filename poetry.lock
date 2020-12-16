@@ -1,4 +1,22 @@
 [[package]]
+name = "aiotarantool"
+version = "1.1.5"
+description = "Tarantool connection driver for work with asyncio"
+category = "main"
+optional = false
+python-versions = "*"
+develop = false
+
+[package.dependencies]
+tarantool = ">=0.5.1"
+
+[package.source]
+type = "git"
+url = "https://github.com/DmitIW/aiotarantool.git"
+reference = "1.0"
+resolved_reference = "4d9d6fdb3140110c4187d3bf62f887f7e083e53a"
+
+[[package]]
 name = "certifi"
 version = "2020.12.5"
 description = "Python package for providing Mozilla's CA Bundle."
@@ -104,9 +122,10 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8.5"
-content-hash = "3707e6837f1c8cec555770692fb864121604fafd92b7bae806b146e6a07193aa"
+content-hash = "76e739d2c02b878ec855092b04d9a0cf54fdd2fa3121490121967c87b83f6ca1"
 
 [metadata.files]
+aiotarantool = []
 certifi = [
     {file = "certifi-2020.12.5-py2.py3-none-any.whl", hash = "sha256:719a74fb9e33b9bd44cc7f3a8d94bc35e4049deebe19ba7d8e108280cfd59830"},
     {file = "certifi-2020.12.5.tar.gz", hash = "sha256:1a4995114262bffbc2413b159f2a1a480c969de6e6eb13ee966d470af86af59c"},
