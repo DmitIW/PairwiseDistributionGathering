@@ -12,9 +12,15 @@ COPY utility .
 WORKDIR /tmp/pdg
 COPY pyproject.toml poetry.lock config.py main.py ./
 
+RUN apt update
+RUN apt install -y git
+
 RUN pip install poetry
 RUN poetry install
 
-RUN ls -al
+RUN apt remove -y git
+RUN apt purge -y git
+RUN apt autoremove -y
+RUN apt clean
 
 CMD poetry run python -u main.py
