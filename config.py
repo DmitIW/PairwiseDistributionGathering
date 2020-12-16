@@ -107,7 +107,7 @@ def init() -> Dict[str, Any]:
                 "url": get_clickhouse_url(),
                 "username": "default"
             },
-        "tarantool_space":
+        "tarantool_connection":
             {
                 "url": get_tarantool_url(),
                 "port": get_tarantool_port(),
