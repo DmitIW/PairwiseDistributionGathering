@@ -3,10 +3,14 @@ import aiotarantool
 from typing import Tuple, NoReturn, Union, Any
 from tarantool import Connection, connect, error
 
-from processing.storage import Storage
+from processing.storage import AStorage
 
 from utility.current_time import current_time
 from utility.connector import if_connected, if_disconnected, Connector
+
+
+def create_aconnection(url: str, port: int, **kwargs) -> aiotarantool.Connection:
+    return aiotarantool.connect(host=url, port=port, **kwargs)
 
 
 def create_connection(url: str, port: int, **kwargs) -> Connection:
@@ -39,7 +43,7 @@ def insert_query(connection: Connection, space_name: Union[int, str],
         print(f"TarantoolAgent:insert:error {str(e)}")
 
 
-class SpaceWriter(Storage, Connector):
+class SpaceWriter(AStorage, Connector):
     def _my_space_name(self) -> str:
         raise NotImplementedError
 
@@ -55,7 +59,7 @@ class SpaceWriter(Storage, Connector):
 
     @if_disconnected
     def connect(self):
-        self.connection = create_connection(**self.connection_context)
+        self.connection = create_aconnection(**self.connection_context)
         return self
 
     @if_connected
@@ -65,11 +69,11 @@ class SpaceWriter(Storage, Connector):
         return self
 
     @if_connected
-    def insert(self, data: Tuple[Union[int, str]]) -> NoReturn:
-        insert_query(self.connection, self._my_space_name(), data, self.expiration_time)
+    async def insert(self, data: Tuple[Union[int, str]]) -> NoReturn:
+        await ainsert_query(self.connection, self._my_space_name(), data, self.expiration_time)
 
-    def store(self, data: Any) -> NoReturn:
-        self.insert(data)
+    async def store(self, data: Any) -> NoReturn:
+        await self.insert(data)
 
     def connected(self) -> bool:
         if self.connection is None:
