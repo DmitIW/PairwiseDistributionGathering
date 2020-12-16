@@ -10,7 +10,7 @@ WORKDIR /tmp/pdg/utility
 COPY utility .
 
 WORKDIR /tmp/pdg
-COPY pyproject.toml poetry.lock config.py pdg.py ./
+COPY pyproject.toml poetry.lock config.py main.py ./
 
 RUN pip install poetry
 RUN poetry install
