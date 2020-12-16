@@ -50,7 +50,6 @@ def main():
         "port": get_tarantool_port(),
         "expiration_time": get_expiration_time()
     }
-
     time_offset = get_time_offset()
 
     global ATTACK_POS, LEGAL_POS, pairs
