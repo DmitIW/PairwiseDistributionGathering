@@ -19,8 +19,16 @@ from processing import (
 )
 
 from utility import (
-    current_time
+    current_time, current_time_str
 )
+
+
+async def task(name: str, work_queue: asyncio.Queue):
+    while not work_queue.empty():
+        job, args = await work_queue.get()
+        response = await job(*args)
+        time_now = current_time_str()
+        print(f"{time_now}::{name}:: OVER; response: {response}")
 
 
 def main():
