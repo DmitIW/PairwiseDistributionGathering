@@ -1,3 +1,5 @@
+import aiotarantool
+
 from typing import Tuple, NoReturn, Union, Any
 from tarantool import Connection, connect, error
 
@@ -9,6 +11,19 @@ from utility.connector import if_connected, if_disconnected, Connector
 
 def create_connection(url: str, port: int, **kwargs) -> Connection:
     return connect(host=url, port=port, **kwargs)
+
+
+async def ainsert_query(connection: aiotarantool.Connection, space_name: Union[int, str],
+                        data: Tuple[Union[str, int]], expiration_time: int) -> NoReturn:
+    time_now = current_time()
+    exp_time = time_now + expiration_time
+    value = data[-1]
+    data = (*data, exp_time)
+
+    try:
+        await connection.upsert(space_name, data, [("=", 2, value), ("=", 3, exp_time)])
+    except error.DatabaseError as e:
+        print(f"TarantoolAgent:insert:error {str(e)}")
 
 
 def insert_query(connection: Connection, space_name: Union[int, str],
