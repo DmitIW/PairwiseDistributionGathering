@@ -1,6 +1,5 @@
 import sys
 import signal
-import time
 import asyncio
 
 from config import (
@@ -30,7 +29,7 @@ async def task(name: str, work_queue: asyncio.Queue):
         time_now = current_time_str()
         print(f"{time_now}::{name}:: START;")
 
-        with flow as context:
+        async with flow as context:
             source = context[0]
             destination = context[1]
             data_gen = map(lambda x: x.row()[:-1], source.exec_query(**flow.get_arguments()))
@@ -46,11 +45,10 @@ async def main():
     for pair in cfg["pairs"]:
 
         source = pair[0]
-
         args = {**cfg["clickhouse_connection"], **{"query_model": source}}
-        ch_agent = ClickhouseAgent(**args)
 
         for position, destination in enumerate(pair[1]):
+            ch_agent = ClickhouseAgent(**args)
             attack = position == cfg["attack_pos"]
             flows.append(
                 create_flow(ch_agent, destination(**cfg["tarantool_connection"]),

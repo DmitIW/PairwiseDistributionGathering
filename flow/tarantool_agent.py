@@ -63,8 +63,8 @@ class SpaceWriter(AStorage, Connector):
         return self
 
     @if_connected
-    def close(self):
-        self.connection.close()
+    async def close(self):
+        await self.connection.close()
         self.connection = None
         return self
 
@@ -85,6 +85,12 @@ class SpaceWriter(AStorage, Connector):
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.close()
+
+    async def __aenter__(self):
+        return self.connect()
+
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
+        await self.close()
 
 
 class Src2DstAttack(SpaceWriter):
