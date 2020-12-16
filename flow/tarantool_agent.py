@@ -14,9 +14,12 @@ def create_connection(url: str, port: int, **kwargs) -> Connection:
 def insert_query(connection: Connection, space_name: Union[int, str],
                  data: Tuple[Union[str, int]], expiration_time: int) -> NoReturn:
     time_now = current_time()
-    data = (*data, time_now + expiration_time)
+    exp_time = time_now + expiration_time
+    value = data[-1]
+    data = (*data, exp_time)
+
     try:
-        connection.upsert(space_name, data, [("=", 3, data[-2]), ("=", 4, data[-1])])
+        connection.upsert(space_name, data, [("=", 2, value), ("=", 3, exp_time)])
     except error.DatabaseError as e:
         print(f"TarantoolAgent:insert:error {str(e)}")
 
