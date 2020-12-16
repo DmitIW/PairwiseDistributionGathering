@@ -67,6 +67,7 @@ end
 box.cfg {
     listen = listen_port,
     background = false,
+    memtx_memory = box.cfg.memtx_memory + 512 * 2 ^ 20, -- workaround solution from https://stackoverflow.com/a/62064950
 }
 
 box.once("init", function()
