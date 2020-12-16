@@ -6,8 +6,6 @@ from processing.storage import Storage
 from utility.time import current_time
 from utility.connector import if_connected, if_disconnected, Connector
 
-from warnings import warn
-
 
 def create_connection(url: str, port: int, **kwargs) -> Connection:
     return connect(host=url, port=port, **kwargs)
@@ -20,7 +18,7 @@ def insert_query(connection: Connection, space_name: Union[int, str],
     try:
         connection.upsert(space_name, data, [("=", 3, data[-2]), ("=", 4, data[-1])])
     except error.DatabaseError as e:
-        warn(f"TarantoolAgent:insert:error {str(e)}", DeprecationWarning, stacklevel=1)
+        print(f"TarantoolAgent:insert:error {str(e)}")
 
 
 class SpaceWriter(Storage, Connector):
