@@ -29,6 +29,7 @@ function obj2obj_dist_space_formatting(space_name, first_obj_name, second_obj_na
     space:create_index(
             'primary',
             {
+                if_not_exists = true,
                 type = 'hash',
                 parts = { first_obj_name, second_obj_name }
             }
