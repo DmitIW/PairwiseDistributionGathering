@@ -68,6 +68,7 @@ box.cfg {
     listen = listen_port,
     background = false,
     memtx_memory = (512 + 256) * 2 ^ 20, -- workaround solution from https://stackoverflow.com/a/62064950
+    slab_alloc_factor=2,                 -- solution for "Failed to allocate memory for memtx .." problem
 }
 
 box.once("init", function()
