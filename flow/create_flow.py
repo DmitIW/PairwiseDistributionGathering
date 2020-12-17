@@ -1,4 +1,4 @@
-from flow.clickhouse_agent import (
+from flow.clickhouse_agent_pwd import (
     ClickhouseAgent
 )
 from processing.storage import (

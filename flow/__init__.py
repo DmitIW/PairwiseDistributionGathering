@@ -1,4 +1,4 @@
-from flow.clickhouse_agent import (
+from flow.clickhouse_agent_pwd import (
     create_connection as ch_connection,
     exec_query,
     Src2Dst, Dst2Src, Dst2Proto, ClickhouseAgent
