@@ -25,6 +25,15 @@ def get_clickhouse_db(variable_name: str = None, default_value: str = None) -> s
     return os.environ.get(variable_name, default_value)
 
 
+def get_clickhouse_user(variable_name: str = None, default_value: str = None) -> str:
+    if variable_name is None:
+        variable_name = "CLICKHOUSE_USER"
+    if default_value is None:
+        default_value = "default"
+
+    return os.environ.get(variable_name, default_value)
+
+
 def get_tarantool_url(variable_name: str = None, default_value: str = None) -> str:
     if variable_name is None:
         variable_name = "TARANTOOL_HOST"
@@ -86,7 +95,7 @@ def init() -> Dict[str, Any]:
             {
                 "database_name": get_clickhouse_db(),
                 "url": get_clickhouse_url(),
-                "username": "default"
+                "username": get_clickhouse_user()
             },
         "tarantool_connection":
             {
