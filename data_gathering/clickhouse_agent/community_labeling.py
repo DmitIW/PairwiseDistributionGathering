@@ -21,10 +21,10 @@ from data_gathering.community_labeling import (
 
 
 class CommunityLabelingQuery(QueryAttributed):
-    q = """SELECT {first_column}, {second_column}, count() AS weight
+    q = """SELECT * FROM (SELECT {first_column}, {second_column}, count() AS weight
 FROM {table}
 WHERE timestamp > toUnixTimestamp(now()) - {time_offset}
-GROUP BY {first_column}, {second_column}"""
+GROUP BY {first_column}, {second_column}) WHERE weight > 1"""
 
 
 class CommunityLabelModel(ResultModel):
