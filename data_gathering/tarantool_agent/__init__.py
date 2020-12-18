@@ -1,7 +1,7 @@
 from data_gathering.tarantool_agent.agent import (
-    TarantoolUpsert
+    TarantoolUpsert, TarantoolUpsertCL
 )
 
 __all__ = [
-    "TarantoolUpsert"
+    "TarantoolUpsert", "TarantoolUpsertCL"
 ]
