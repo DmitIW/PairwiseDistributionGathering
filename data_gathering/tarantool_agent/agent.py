@@ -60,3 +60,24 @@ class TarantoolUpsert:
         async with self.tarantool_agent as conn:
             for data in data_generator:
                 await self._upsert(conn, data)
+
+
+class TarantoolAgentCL(TarantoolAgent):
+    async def upsert(self, space_name: Union[str, int], data: Tuple[Union[str, int]], expiration_time: int):
+        exp_time = current_time() + expiration_time
+        new_value = data[-1]
+        slc = data[-2]
+        data = (*data, exp_time)
+
+        try:
+            await self.conn.upsert(space_name, data,
+                                   [("=", 1, new_value),
+                                    ("=", 2, slc), ("=", 3, exp_time)])
+        except error.DatabaseError as e:
+            print(f"TarantoolAgent:upsert:error {str(e)}")
+
+
+class TarantoolUpsertCL(TarantoolUpsert):
+    def __init__(self, url: str, port: int, space_name: str, expiration_time: int, **kwargs):
+        super(TarantoolUpsertCL, self).__init__(url, port, space_name, expiration_time, **kwargs)
+        self.tarantool_agent = AConnection(TarantoolAgentCL(), url=url, port=port, **kwargs)
