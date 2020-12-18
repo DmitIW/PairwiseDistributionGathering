@@ -1,16 +1,7 @@
 import os
 
-from constraints import (
+from data_gathering.utility.constraints import (
     return_int
-)
-
-from data_gathering.union import (
-    Src2Dst, Dst2Src, Dst2Proto,
-)
-from data_gathering.union import (
-    Src2DstAttack, Src2DstLegal,
-    Dst2SrcAttack, Dst2SrcLegal,
-    Dst2ProtoAttack, Dst2ProtoLegal
 )
 
 from typing import Dict, Any
@@ -89,17 +80,7 @@ def get_updating_interval(variable_name: str = None, default_value: int = None) 
     return os.environ.get(variable_name, default_value)
 
 
-pairs = [
-    (Src2Dst, (Src2DstLegal, Src2DstAttack)),
-    (Dst2Src, (Dst2SrcLegal, Dst2SrcAttack)),
-    (Dst2Proto, (Dst2ProtoLegal, Dst2ProtoAttack))
-]
-ATTACK_POS = 1
-LEGAL_POS = 0
-
-
 def init() -> Dict[str, Any]:
-    global pairs, ATTACK_POS, LEGAL_POS
     return {
         "clickhouse_connection":
             {
@@ -113,9 +94,6 @@ def init() -> Dict[str, Any]:
                 "port": get_tarantool_port(),
                 "expiration_time": get_expiration_time()
             },
-        "pairs": pairs,
-        "attack_pos": ATTACK_POS,
-        "legal_pos": LEGAL_POS,
         "time_offset": get_time_offset(),
         "updating_interval": get_updating_interval(),
     }
