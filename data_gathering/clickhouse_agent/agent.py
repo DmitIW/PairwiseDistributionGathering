@@ -50,4 +50,5 @@ class ClickhouseQuery:
 
     def execute(self) -> Generator[Any, Any, None]:
         with self.clickhouse_agent as conn:
-            yield from conn.select(self.query, self.clickhouse_query_model)
+            yield from map(lambda x: x.row(),
+                           conn.select(self.query, self.clickhouse_query_model))

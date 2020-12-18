@@ -12,7 +12,4 @@ class Flow:
         return self
 
     async def start(self):
-        await self.tarantool.upsert_from(
-            map(lambda x: x.row(),
-                self.clickhouse.execute())
-        )
+        await self.tarantool.upsert_from(self.clickhouse.execute())
