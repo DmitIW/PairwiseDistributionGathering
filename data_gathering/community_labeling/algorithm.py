@@ -28,4 +28,4 @@ def gathering_nodes(data_flow: Iterator) -> np.ndarray:
 
 def algorithm(data_flow: Iterator) -> Generator[Any, Any, None]:
     for node, comm in get_partition(get_graph(gathering_nodes(data_flow), True), True).items():
-        yield node, comm
+        yield int(node), int(comm)
