@@ -1,3 +1,7 @@
+from infi.clickhouse_orm import (
+    UInt32Field, UInt16Field, Memory, Model
+)
+
 from clickhouse_agent.query import (
     QueryAttributed
 )
@@ -22,3 +26,47 @@ from {table}
     prewhere timestamp > toUnixTimestamp(now()) - {time_offset}
 where {table}.{first_column} != 0
 group by {table}.{first_column}"""
+
+
+class PairWiseModel(Model):
+    engine = Memory()
+
+    @staticmethod
+    def table(database_name: str, attack: bool) -> str:
+        table = "accept"
+        if attack:
+            table = "drop"
+        return f"{database_name}.{table}"
+
+    def row(self) -> tuple:
+        return tuple(self.__dict__.values())[:-1]
+
+    def _get_column_name(self, n: int) -> str:
+        return tuple(self.__dict__.keys())[n]
+
+    def first_column(self) -> str:
+        return self._get_column_name(0)
+
+    def second_column(self) -> str:
+        return self._get_column_name(1)
+
+    def counter_column(self) -> str:
+        return self._get_column_name(2)
+
+
+class Src2Dst(PairWiseModel):
+    src_port = UInt16Field()
+    dst_port = UInt16Field()
+    total_count = UInt32Field()
+
+
+class Dst2Src(PairWiseModel):
+    dst_port = UInt16Field()
+    src_port = UInt16Field()
+    total_count = UInt32Field()
+
+
+class Dst2Proto(PairWiseModel):
+    dst_port = UInt16Field()
+    proto = UInt16Field()
+    total_count = UInt32Field()

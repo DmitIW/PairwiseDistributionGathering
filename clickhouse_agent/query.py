@@ -123,8 +123,12 @@ class QueryAttributed(Query):
     def set_arguments(self, *args, **kwargs):
         for attr, value in self._attributes():
             if value is None:
-                raise TypeError(f"Attribute {attr} is not set")
+                raise RuntimeError(f"Attribute {attr} is not set")
             if type(value) != str:
-                raise TypeError(f"Attribute {attr} has wrong type: {type(value)}")
+                raise RuntimeError(f"Attribute {attr} has wrong type: {type(value)}")
             kwargs[attr] = value
-        super(QueryAttributed, self).set_arguments(*args, **kwargs)
+        return super(QueryAttributed, self).set_arguments(*args, **kwargs)
+
+
+def limited_result(query: str, n: int) -> str:
+    return f"""SELECT * FROM ({query}) LIMIT {n}"""

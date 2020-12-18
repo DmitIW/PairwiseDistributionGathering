@@ -57,18 +57,32 @@ def disconnect(method):
     return _connect
 
 
-class Closeable:
-    def __init__(self, obj, closing):
-        self.obj = obj
-        self.closing = closing
+class Connector:
+    def __init__(self, connection_method: Any):
+        self.connection_method = connection_method
 
-    def close(self, *args, **kwargs) -> NoReturn:
-        self.closing(self.obj, *args, **kwargs)
+    def __call__(self, *args, **kwargs):
+        return self.connection_method(*args, **kwargs)
+
+
+class AConnector(Connector):
+    async def __call__(self, *args, **kwargs):
+        result = await self.connection_method(*args, **kwargs)
+        return result
+
+
+class Closeable:
+    def __init__(self, close_method: Any, **kwargs):
+        self.close_method = close_method
+        self.kwargs = kwargs
+
+    def close(self):
+        self.close_method(**self.kwargs)
 
 
 class ACloseable(Closeable):
-    async def close(self, *args, **kwargs) -> NoReturn:
-        await self.closing(self.obj, *args, **kwargs)
+    async def close(self):
+        await self.close_method(**self.kwargs)
 
 
 class Connection(Connected):
@@ -83,18 +97,21 @@ class Connection(Connected):
     @connect
     def start(self):
         self._connection = self._connector(*self._args, **self._kwargs)
-        return self
+        return self._connection
 
     @is_connected
     @disconnect
     def stop(self):
         self._connection.close()
+        self._connection = None
         return self
 
     def __enter__(self):
         return self.start()
 
     def __exit__(self, exc_type, exc_val, exc_tb):
+        if exc_type is not None:
+            raise exc_type(exc_val)
         return self.stop()
 
 
@@ -103,18 +120,19 @@ class AConnection(Connection):
     @connect
     async def start(self):
         self._connection = await self._connector(*self._args, **self._kwargs)
-        return self
+        return self._connection
 
     @is_connected
     @disconnect
     async def stop(self):
         await self._connection.close()
+        self._connection = None
         return self
 
-    def __aenter__(self):
+    async def __aenter__(self):
         result = await self.start()
         return result
 
-    def __aexit__(self, exc_type, exc_val, exc_tb):
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
         result = await self.stop()
         return result
