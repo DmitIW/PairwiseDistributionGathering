@@ -65,8 +65,8 @@ class TarantoolUpsert:
 class TarantoolAgentCL(TarantoolAgent):
     async def upsert(self, space_name: Union[str, int], data: Tuple[Union[str, int]], expiration_time: int):
         exp_time = current_time() + expiration_time
-        new_value = data[-1]
-        slc = data[-2]
+        new_value = data[-2]
+        slc = data[-1]
         data = (*data, exp_time)
 
         try:
