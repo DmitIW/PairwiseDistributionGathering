@@ -1,4 +1,4 @@
-from data_gathering.community_labeling import (
+from data_gathering.community_labeling.algorithm import (
     algorithm as comm_labelling
 )
 
