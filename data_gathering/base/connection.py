@@ -110,9 +110,9 @@ class Connection(Connected):
         return self.start()
 
     def __exit__(self, exc_type, exc_val, exc_tb):
+        self.stop()
         if exc_type is not None:
             raise exc_type(exc_val)
-        return self.stop()
 
 
 class AConnection(Connection):
@@ -134,5 +134,6 @@ class AConnection(Connection):
         return result
 
     async def __aexit__(self, exc_type, exc_val, exc_tb):
-        result = await self.stop()
-        return result
+        await self.stop()
+        if exc_type is not None:
+            raise exc_type(exc_val)
