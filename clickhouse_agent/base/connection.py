@@ -1,4 +1,4 @@
-from typing import NoReturn, Callable, Any, Awaitable
+from typing import NoReturn, Callable, Any
 
 from functools import wraps
 
@@ -83,6 +83,7 @@ class Closeable:
 class ACloseable(Closeable):
     async def close(self):
         await self.close_method(**self.kwargs)
+
 
 
 class Connection(Connected):

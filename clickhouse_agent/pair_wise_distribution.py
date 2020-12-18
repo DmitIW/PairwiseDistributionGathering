@@ -1,9 +1,13 @@
 from infi.clickhouse_orm import (
-    UInt32Field, UInt16Field, Memory, Model
+    UInt32Field, UInt16Field
 )
 
-from clickhouse_agent.query import (
+from clickhouse_agent.base.query import (
     QueryAttributed
+)
+
+from clickhouse_agent.base.result_model import (
+    ResultModel
 )
 
 
@@ -28,8 +32,8 @@ where {table}.{first_column} != 0
 group by {table}.{first_column}"""
 
 
-class PairWiseModel(Model):
-    engine = Memory()
+class PairWiseModel(ResultModel):
+    bind_query = PairWiseQuery
 
     @staticmethod
     def table(database_name: str, attack: bool) -> str:
@@ -38,20 +42,19 @@ class PairWiseModel(Model):
             table = "drop"
         return f"{database_name}.{table}"
 
-    def row(self) -> tuple:
-        return tuple(self.__dict__.values())[:-1]
-
     def _get_column_name(self, n: int) -> str:
         return tuple(self.__dict__.keys())[n]
 
-    def first_column(self) -> str:
-        return self._get_column_name(0)
+    def construct_query(self, time_offset: int, database_name: str,
+                        under_attack: bool) -> str:
+        query = self.bind_query()
 
-    def second_column(self) -> str:
-        return self._get_column_name(1)
+        query.time_offset = str(time_offset)
+        query.table = self.table(database_name, under_attack)
+        query.first_column = self._get_column_name(0)
+        query.second_column = self._get_column_name(1)
 
-    def counter_column(self) -> str:
-        return self._get_column_name(2)
+        return query.set_arguments().query()
 
 
 class Src2Dst(PairWiseModel):
