@@ -65,14 +65,13 @@ class TarantoolUpsert:
 class TarantoolAgentCL(TarantoolAgent):
     async def upsert(self, space_name: Union[str, int], data: Tuple[Union[str, int]], expiration_time: int):
         exp_time = current_time() + expiration_time
-        new_value = data[-2]
-        slc = data[-1]
+        new_value = data[-1]
         data = (*data, exp_time)
 
         try:
             await self.conn.upsert(space_name, data,
                                    [("=", 1, new_value),
-                                    ("=", 2, slc), ("=", 3, exp_time)])
+                                    ("=", 2, exp_time)])
         except error.DatabaseError as e:
             print(f"TarantoolAgent:upsert:error {str(e)}")
 
