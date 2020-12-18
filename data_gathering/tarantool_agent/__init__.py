@@ -1,4 +1,4 @@
-from tarantool_agent.agent import (
+from data_gathering.tarantool_agent.agent import (
     TarantoolUpsert
 )
 

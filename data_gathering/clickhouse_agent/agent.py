@@ -4,11 +4,11 @@ from infi.clickhouse_orm import (
     Database, Model
 )
 
-from base.connection import (
+from data_gathering.base.connection import (
     Connector, Closeable, Connection
 )
 
-from clickhouse_agent.base.result_model import (
+from data_gathering.clickhouse_agent.base.result_model import (
     ResultModel, make_query
 )
 

@@ -1,5 +1,5 @@
-from clickhouse_agent import ClickhouseQuery
-from tarantool_agent import TarantoolUpsert
+from data_gathering.clickhouse_agent.agent import ClickhouseQuery
+from data_gathering.tarantool_agent.agent import TarantoolUpsert
 
 
 class Flow:

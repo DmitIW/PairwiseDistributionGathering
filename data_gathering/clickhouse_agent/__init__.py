@@ -1,4 +1,4 @@
-from clickhouse_agent.agent import (
+from data_gathering.clickhouse_agent.agent import (
     ClickhouseQuery
 )
 

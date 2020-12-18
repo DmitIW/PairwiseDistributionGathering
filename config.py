@@ -1,13 +1,13 @@
 import os
 
-from utility.constraints import (
+from constraints import (
     return_int
 )
 
-from flow import (
+from data_gathering.union import (
     Src2Dst, Dst2Src, Dst2Proto,
 )
-from flow import (
+from data_gathering.union import (
     Src2DstAttack, Src2DstLegal,
     Dst2SrcAttack, Dst2SrcLegal,
     Dst2ProtoAttack, Dst2ProtoLegal

@@ -5,11 +5,11 @@ import asyncio
 from config import (
     init
 )
-from flow import (
+from data_gathering.union import (
     ClickhouseAgent
 )
 
-from flow import (
+from data_gathering.union import (
     create_flow
 )
 
@@ -17,7 +17,7 @@ from processing import (
     flow_processing_task
 )
 
-from utility import (
+from data_gathering.utility import (
     current_time, current_time_str
 )
 

@@ -2,11 +2,11 @@ from infi.clickhouse_orm import (
     UInt32Field, UInt16Field
 )
 
-from clickhouse_agent.base.query import (
+from data_gathering.clickhouse_agent.base.query import (
     QueryAttributed
 )
 
-from clickhouse_agent.base.result_model import (
+from data_gathering.clickhouse_agent.base.result_model import (
     ResultModel
 )
 

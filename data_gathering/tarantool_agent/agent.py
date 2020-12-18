@@ -3,11 +3,11 @@ from tarantool import error
 
 from typing import Union, Tuple
 
-from base.connection import (
+from data_gathering.base.connection import (
     AConnector, ACloseable, AConnection
 )
 
-from base.time_utility import (
+from data_gathering.base.time_utility import (
     current_time
 )
 
