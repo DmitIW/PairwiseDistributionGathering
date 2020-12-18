@@ -1,7 +1,7 @@
 import aiotarantool
 from tarantool import error
 
-from typing import Union, Tuple
+from typing import Union, Tuple, Generator, Any, Iterator
 
 from data_gathering.base.connection import (
     AConnector, ACloseable, AConnection
@@ -49,6 +49,14 @@ class TarantoolUpsert:
         self.space_name = space_name
         self.expiration_time = expiration_time
 
+    async def _upsert(self, connection: TarantoolAgent, data: Tuple[Union[str, int]]):
+        await connection.upsert(space_name=self.space_name, data=data, expiration_time=self.expiration_time)
+
     async def upsert(self, data: Tuple[Union[str, int]]):
         async with self.tarantool_agent as conn:
-            await conn.upsert(space_name=self.space_name, data=data, expiration_time=self.expiration_time)
+            await self._upsert(conn, data)
+
+    async def upsert_from(self, data_generator: Union[Generator[Tuple[Union[str, int]], Any, None], Iterator]):
+        async with self.tarantool_agent as conn:
+            for data in data_generator:
+                await self._upsert(conn, data)
