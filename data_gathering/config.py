@@ -93,7 +93,7 @@ def init() -> Dict[str, Any]:
     return {
         "clickhouse_connection":
             {
-                "database_name": get_clickhouse_db(),
+                "database": get_clickhouse_db(),
                 "url": get_clickhouse_url(),
                 "username": get_clickhouse_user()
             },
