@@ -4,7 +4,7 @@ from infi.clickhouse_orm import (
     Database, Model
 )
 
-from clickhouse_agent.base.connection import (
+from base.connection import (
     Connector, Closeable, Connection
 )
 

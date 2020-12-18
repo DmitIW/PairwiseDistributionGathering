@@ -85,7 +85,6 @@ class ACloseable(Closeable):
         await self.close_method(**self.kwargs)
 
 
-
 class Connection(Connected):
     def __init__(self, connector: Callable, *args, **kwargs):
         super(Connection, self).__init__()
