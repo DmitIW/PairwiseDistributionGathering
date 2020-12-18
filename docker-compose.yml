@@ -2,7 +2,7 @@ version: '3'
 
 services:
   tarantool1:
-    container_name: pdg.tarantool
+    container_name: dg.tarantool
     image: tarantool/tarantool:latest
     ports:
       - "3302:3301"
@@ -27,3 +27,20 @@ services:
     network_mode: host
     depends_on:
       - tarantool1
+
+  cl:
+    build:
+      context: .
+      dockerfile: Dockerfile.cl
+    image: cl
+    container_name: cl
+    environment:
+      - CLICKHOUSE_URL=http://10.2.22.54:8123
+      - CLICKHOUSE_DB=pieflow
+      - TARANTOOL_PORT=3302
+      - GATHERING_TIME_OFFSET=900   # 60 * 15 * 1 == 15 minutes
+      - UPDATING_INTERVAL=1800      # 60 * 30 * 1 == 30 minutes
+      - FACT_EXPIRATION_TIME=10800  # 60 * 60 * 3 == 3 hours
+    network_mode: host
+      depends_on:
+        - tarantool1
