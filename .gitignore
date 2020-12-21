@@ -2,3 +2,6 @@
 
 tarantool.cache/*.snap
 tarantool.cache/*.xlog
+
+tarantool.cache/gdb/*.snap
+tarantool.cache/cl/*.xlog
