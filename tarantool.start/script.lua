@@ -47,6 +47,7 @@ function obj2id_space_formatting(space_name, obj_name, obj_type)
     format = {
         create_field(obj_name, obj_type),
         create_field("id", "unsigned"),
+        create_field("slice", "unsigned"),
         create_field("time", "unsigned"),
     }
     space = box.schema.space.create(space_name, { format = format, if_not_exists = true })
