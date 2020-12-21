@@ -2,15 +2,24 @@ version: '3'
 
 services:
   tarantool1:
-    container_name: dg.tarantool
+    container_name: dg.tarantool_gdb
     image: tarantool/tarantool:latest
     ports:
       - "3302:3301"
     volumes:
       - ./tarantool.start:/opt/tarantool
-      - ./tarantool.cache:/var/lib/tarantool
+      - ./tarantool.cache/gdb:/var/lib/tarantool
     command: tarantool /opt/tarantool/script.lua
 
+  tarantool2:
+    container_name: dg.tarantool_cl
+    image: tarantool/tarantool:latest
+    ports:
+      - "3303:3301"
+    volumes:
+      - ./tarantool.start:/opt/tarantool
+      - ./tarantool.cache/cl:/var/lib/tarantool
+    command: tarantool /opt/tarantool/script.lua
   pdg:
     build:
       context: .
@@ -37,10 +46,10 @@ services:
     environment:
       - CLICKHOUSE_URL=http://10.2.22.54:8123
       - CLICKHOUSE_DB=pieflow
-      - TARANTOOL_PORT=3302
+      - TARANTOOL_PORT=3303
       - GATHERING_TIME_OFFSET=900   # 60 * 15 * 1 == 15 minutes
       - UPDATING_INTERVAL=1800      # 60 * 30 * 1 == 30 minutes
-      - FACT_EXPIRATION_TIME=10800  # 60 * 60 * 3 == 3 hours
+      - FACT_EXPIRATION_TIME=3600   # 60 * 60 * 1 == 1 hours
     network_mode: host
     depends_on:
         - tarantool1
