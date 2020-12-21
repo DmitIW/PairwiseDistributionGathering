@@ -4,6 +4,8 @@ import community as community_louvain
 
 from typing import Generator, Any, Dict, Iterator
 
+from data_gathering.base.time_utility import current_unix_minute
+
 
 def get_partition(graph: nx.Graph, delete: bool) -> Dict[str, Any]:
     result = community_louvain.best_partition(graph)
@@ -29,6 +31,11 @@ def gathering_nodes(data_flow: Iterator) -> np.ndarray:
     return np.array([data for data in data_flow])
 
 
+def get_current_slice() -> int:
+    return current_unix_minute()
+
+
 def algorithm(data_flow: Iterator) -> Generator[Any, Any, None]:
+    slice_number = current_unix_minute()
     for node, comm in get_partition(get_graph(gathering_nodes(data_flow), True), True).items():
-        yield int(node), int(comm)
+        yield int(node), int(comm), int(slice_number)
