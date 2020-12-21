@@ -13,9 +13,12 @@ def get_partition(graph: nx.Graph, delete: bool) -> Dict[str, Any]:
 
 
 def get_graph(nodes: np.ndarray, delete: bool) -> nx.Graph:
+    graph = nx.Graph()
+    if nodes.shape[0] == 0:
+        return graph
+
     if nodes.shape[1] != 3:
         raise TypeError("Unexpected the number of dimensions for nodes")
-    graph = nx.Graph()
     graph.add_weighted_edges_from(nodes)
     if delete:
         del nodes
