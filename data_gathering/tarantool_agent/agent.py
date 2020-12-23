@@ -1,7 +1,7 @@
 import aiotarantool
 from tarantool import error
 
-from typing import Union, Tuple, Generator, Any, Iterator
+from typing import Union, Tuple, Generator, Any, Iterator, NoReturn
 
 from data_gathering.base.connection import (
     AConnector, ACloseable, AConnection
@@ -48,15 +48,22 @@ class TarantoolUpsert:
         self.tarantool_agent = AConnection(TarantoolAgent(), url=url, port=port, **kwargs)
         self.space_name = space_name
         self.expiration_time = expiration_time
+        self.upserting_time = 0
+
+    def set_upserting_time(self) -> NoReturn:
+        self.upserting_time = current_time()
 
     async def _upsert(self, connection: TarantoolAgent, data: Tuple[Union[str, int]]):
-        await connection.upsert(space_name=self.space_name, data=data, expiration_time=self.expiration_time)
+        expiration_time = self.upserting_time + self.expiration_time
+        await connection.upsert(space_name=self.space_name, data=data, expiration_time=expiration_time)
 
     async def upsert(self, data: Tuple[Union[str, int]]):
+        self.set_upserting_time()
         async with self.tarantool_agent as conn:
             await self._upsert(conn, data)
 
     async def upsert_from(self, data_generator: Union[Generator[Tuple[Union[str, int]], Any, None], Iterator]):
+        self.set_upserting_time()
         async with self.tarantool_agent as conn:
             for data in data_generator:
                 await self._upsert(conn, data)
@@ -64,7 +71,7 @@ class TarantoolUpsert:
 
 class TarantoolAgentCL(TarantoolAgent):
     async def upsert(self, space_name: Union[str, int], data: Tuple[Union[str, int]], expiration_time: int):
-        exp_time = current_time() + expiration_time
+        exp_time = expiration_time
         new_value = data[-2]
         slice_number = data[-1]
         data = (*data, exp_time)
