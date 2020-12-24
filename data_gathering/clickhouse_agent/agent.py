@@ -1,7 +1,7 @@
 from typing import Generator, Any
 
 from infi.clickhouse_orm import (
-    Database, Model
+    Database, Model, DatabaseException
 )
 
 from data_gathering.base.connection import (
@@ -10,6 +10,10 @@ from data_gathering.base.connection import (
 
 from data_gathering.clickhouse_agent.base.result_model import (
     ResultModel, make_query
+)
+
+from data_gathering.base.time_utility import (
+    current_time_str
 )
 
 
@@ -49,6 +53,11 @@ class ClickhouseQuery:
         return self
 
     def execute(self) -> Generator[Any, Any, None]:
-        with self.clickhouse_agent as conn:
-            yield from map(lambda x: x.row(),
-                           conn.select(self.query, self.clickhouse_query_model))
+        try:
+            with self.clickhouse_agent as conn:
+                yield from map(lambda x: x.row(),
+                               conn.select(self.query, self.clickhouse_query_model))
+        except DatabaseException as de:
+            print(f"{current_time_str()}:Clickhouse connection:Database exception: {de}")
+        except RuntimeError as e:
+            print(f"{current_time_str()}:Clickhouse connection:Something has gone wrong: {e}")

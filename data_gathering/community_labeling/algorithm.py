@@ -28,7 +28,7 @@ def get_graph(nodes: np.ndarray, delete: bool) -> nx.Graph:
 
 
 def gathering_nodes(data_flow: Iterator) -> np.ndarray:
-    return np.array([data for data in data_flow])
+    return np.array([data for data in filter(lambda x: x is not None, data_flow)])
 
 
 def get_current_slice() -> int:
